@@ -1,1 +1,1 @@
-# zitadel-bootstraper
+# zitadel-bootstrapper
