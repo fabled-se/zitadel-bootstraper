@@ -1,0 +1,15 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: zitadel-bootstrapper
+spec:
+  backoffLimit: 5
+  template:
+    spec:
+      containers:
+      - name: zitadel-bootstrapper
+        image: zitadel-bootstrapper:0.0.1
+        env:
+          - name: hello
+            value: {{ index .Values "zitadel-bootstrapper" "hello" }}
+      restartPolicy: OnFailure
