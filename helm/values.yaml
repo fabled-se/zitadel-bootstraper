@@ -1,4 +1,5 @@
 zitadel:
+  TLS: false
   Domain: "zitadel.local"
   OrgName: "platform"
   ServiceUserName: "myuser"
