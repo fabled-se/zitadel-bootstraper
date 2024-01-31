@@ -18,18 +18,18 @@ func main() {
 	zitadelServiceUser := mustEnvVar(logger, "ZITADEL_SERVICE_USER")
 	zitadelServiceUserKeyJson := mustEnvVar(logger, "ZITADEL_SERVICE_USER_KEY_JSON")
 
-	jwtKey, err := zitadel.NewJWT([]byte(zitadelServiceUserKeyJson), zitadelDomain)
-	if err != nil {
-		logger.Err(err).Msg("Failed to create a new Zitadel JWT")
-		os.Exit(1)
-	}
-
 	zitadelClient := zitadel.Client{
 		HttpClient:  http.DefaultClient,
 		TLS:         zitadelTLS,
 		Domain:      zitadelDomain,
 		OrgName:     zitadelOrgName,
 		ServiceUser: zitadelServiceUser,
+	}
+
+	jwtKey, err := zitadelClient.NewJWT([]byte(zitadelServiceUserKeyJson), zitadelDomain)
+	if err != nil {
+		logger.Err(err).Msg("Failed to create a new Zitadel JWT")
+		os.Exit(1)
 	}
 
 	if err := zitadelClient.SetupOauthToken(jwtKey); err != nil {

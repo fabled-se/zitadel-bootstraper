@@ -10,7 +10,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-func NewJWT(keyDataJson []byte, domain string) (string, error) {
+func (c *Client) NewJWT(keyDataJson []byte, domain string) (string, error) {
 	data := struct {
 		KeyID  string `json:"keyId"`
 		Key    string `json:"key"`
@@ -30,9 +30,9 @@ func NewJWT(keyDataJson []byte, domain string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodRS256, jwt.MapClaims{
 		"iss": data.UserId,
 		"sub": data.UserId,
-		"aud": "https://" + domain,
-		"iat": time.Now().Unix(),
-		"exp": time.Now().Add(5 * time.Minute).Unix(),
+		"aud": c.getBaseUrl(),
+		"iat": time.Now().UTC().Unix(),
+		"exp": time.Now().UTC().Add(5 * time.Minute).Unix(),
 	})
 
 	token.Header["kid"] = data.KeyID
