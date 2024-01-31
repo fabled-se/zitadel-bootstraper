@@ -7,7 +7,7 @@ spec:
   template:
     spec:
       volumes:
-        - name: secret-volume
+        - name: config
           secret:
             secretName: zitadel-bootstrapper-config
       containers:
@@ -28,7 +28,7 @@ spec:
                 name: {{ .Values.zitadel.ServiceUserName }}
                 key: {{  .Values.zitadel.ServiceUserName }}{{ ".json" }}
         volumeMounts:
-          - name: secret-volume
+          - name: config
             readOnly: true
-            mountPath: "/etc/secret-volume"
+            mountPath: "/etc/zitadel-bootstrapper-config"
       restartPolicy: OnFailure
