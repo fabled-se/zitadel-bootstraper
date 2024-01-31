@@ -10,13 +10,15 @@ spec:
       - name: zitadel-bootstrapper
         image: gothenburg/zitadel-bootstrapper:latest
         env:
+          - name: ZITADEL_DOMAIN
+            value: {{ .Values.zitadel.Domain }}
           - name: ZITADEL_ORGNAME
-            value: {{ index .Values "zitadel-bootstrapper" "OrgName" }}
+            value: {{ .Values.zitadel.OrgName }}
           - name: ZITADEL_SERVICE_USER
-            value: {{ index .Values "zitadel-bootstrapper" "ServiceUserName" }}
+            value: {{ .Values.zitadel.ServiceUserName }}
           - name: ZITADEL_SERVICE_USER_KEY_JSON
             valueFrom:
               secretKeyRef:
-                name: {{ index .Values "zitadel-bootstrapper" "ServiceUserName" }}
-                key: {{  index .Values "zitadel-bootstrapper" "ServiceUserName" }}{{ ".json" }}
+                name: {{ .Values.zitadel.ServiceUserName }}
+                key: {{  .Values.zitadel.ServiceUserName }}{{ ".json" }}
       restartPolicy: OnFailure

@@ -1,3 +1,4 @@
-zitadel-bootstrapper:
-  OrgName: ""
-  ServiceUserName: ""
+zitadel:
+  Domain: "zitadel.local"
+  OrgName: "platform"
+  ServiceUserName: "myuser"
