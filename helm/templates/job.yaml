@@ -8,8 +8,14 @@ spec:
     spec:
       containers:
       - name: zitadel-bootstrapper
-        image: zitadel-bootstrapper:0.0.1
+        image: gothenburg/zitadel-bootstrapper:latest
         env:
-          - name: hello
-            value: {{ index .Values "zitadel-bootstrapper" "hello" }}
+          - name: zitadelOrgName
+            value: {{ index .Values "zitadel-bootstrapper" "OrgName" }}
+          - name: zitadelServiceUser
+            value: {{ index .Values "zitadel-bootstrapper" "ServiceUserName" }}
+          - name: zitadelServiceUserToken
+            valueFrom:
+              secretKeyRef:
+                name: {{ index .Values "zitadel-bootstrapper" "ServiceUserName" }}
       restartPolicy: OnFailure
