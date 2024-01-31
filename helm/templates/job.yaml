@@ -11,7 +11,7 @@ spec:
         image: gothenburg/zitadel-bootstrapper:latest
         env:
           - name: ZITADEL_TLS
-            value: {{ .Values.zitadel.TLS }}
+            value: "{{ .Values.zitadel.TLS }}"
           - name: ZITADEL_DOMAIN
             value: {{ .Values.zitadel.Domain }}
           - name: ZITADEL_ORGNAME
