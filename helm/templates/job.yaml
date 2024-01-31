@@ -6,6 +6,10 @@ spec:
   backoffLimit: 5
   template:
     spec:
+      volumes:
+        - name: secret-volume
+          secret:
+            secretName: zitadel-bootstrapper
       containers:
       - name: zitadel-bootstrapper
         image: gothenburg/zitadel-bootstrapper:latest
@@ -23,4 +27,8 @@ spec:
               secretKeyRef:
                 name: {{ .Values.zitadel.ServiceUserName }}
                 key: {{  .Values.zitadel.ServiceUserName }}{{ ".json" }}
+        volumeMounts:
+          - name: secret-volume
+            readOnly: true
+            mountPath: "/etc/secret-volume"
       restartPolicy: OnFailure

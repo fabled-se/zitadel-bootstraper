@@ -3,3 +3,10 @@ zitadel:
   Domain: "zitadel.local"
   OrgName: "platform"
   ServiceUserName: "myuser"
+
+config:
+  adminAccount:
+    setup: false
+    orgName: platform
+    username: platform@fabled.se
+    password: ""
