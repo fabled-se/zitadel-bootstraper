@@ -35,6 +35,8 @@ func NewJWT(keyDataJson []byte, domain string) (string, error) {
 		"exp": time.Now().Add(5 * time.Minute).Unix(),
 	})
 
+	token.Header["kid"] = data.KeyID
+
 	tokenString, err := token.SignedString(privateKey)
 	if err != nil {
 		return "", fmt.Errorf("failed to sign jwt with private key: %w", err)
