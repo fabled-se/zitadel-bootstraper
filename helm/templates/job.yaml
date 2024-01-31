@@ -9,7 +9,7 @@ spec:
       volumes:
         - name: secret-volume
           secret:
-            secretName: zitadel-bootstrapper
+            secretName: zitadel-bootstrapper-config
       containers:
       - name: zitadel-bootstrapper
         image: gothenburg/zitadel-bootstrapper:latest
