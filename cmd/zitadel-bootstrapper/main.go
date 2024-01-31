@@ -3,6 +3,7 @@ package main
 import (
 	"net/http"
 	"os"
+	"strconv"
 
 	"github.com/fabled-se/zitadel-bootstraper/internal/zitadel"
 	"github.com/rs/zerolog"
@@ -11,6 +12,7 @@ import (
 func main() {
 	logger := zerolog.New(os.Stdout)
 
+	zitadelTLS := mustBool(logger, mustEnvVar(logger, "ZITADEL_TLS"))
 	zitadelDomain := mustEnvVar(logger, "ZITADEL_DOMAIN")
 	zitadelOrgName := mustEnvVar(logger, "ZITADEL_ORGNAME")
 	zitadelServiceUser := mustEnvVar(logger, "ZITADEL_SERVICE_USER")
@@ -24,6 +26,7 @@ func main() {
 
 	zitadelClient := zitadel.Client{
 		HttpClient:  http.DefaultClient,
+		TLS:         zitadelTLS,
 		Domain:      zitadelDomain,
 		OrgName:     zitadelOrgName,
 		ServiceUser: zitadelServiceUser,
@@ -35,6 +38,15 @@ func main() {
 	}
 
 	logger.Info().Msg("Success")
+}
+
+func mustBool(logger zerolog.Logger, value string) bool {
+	boolValue, err := strconv.ParseBool(value)
+	if err != nil {
+		logger.Err(err).Msgf("Value '%s' must be parsed to bool", value)
+		os.Exit(1)
+	}
+	return boolValue
 }
 
 func mustEnvVar(logger zerolog.Logger, key string) string {

@@ -11,11 +11,21 @@ import (
 
 type Client struct {
 	HttpClient  *http.Client
+	TLS         bool
 	Domain      string
 	OrgName     string
 	ServiceUser string
 
 	serviceUserToken string
+}
+
+func (c *Client) getBaseUrl() string {
+	protocol := "http"
+	if c.TLS {
+		protocol = "https"
+	}
+
+	return fmt.Sprintf("%s://%s", protocol, c.Domain)
 }
 
 func (c *Client) SetupOauthToken(jwt string) error {
@@ -26,7 +36,7 @@ func (c *Client) SetupOauthToken(jwt string) error {
 
 	req, err := http.NewRequest(
 		"POST",
-		fmt.Sprintf("https://%s/oauth/v2/token", c.Domain),
+		fmt.Sprintf("%s/oauth/v2/token", c.getBaseUrl()),
 		strings.NewReader(form.Encode()),
 	)
 	if err != nil {
