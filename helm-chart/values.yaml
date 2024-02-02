@@ -9,3 +9,14 @@ config:
     setup: false
     username: platform@fabled.se
     password: ""
+
+  argoCD:
+    setup: false
+    name: ArgoCD
+    userRoleName: argocd_users
+    adminRoleName: argocd_administrators
+    devMode: false
+    redirectUris:
+      - https://argocd.argocd.svc.cluster.local/auth/callback
+    logoutUris:
+      - https://argocd.argocd.svc.cluster.local

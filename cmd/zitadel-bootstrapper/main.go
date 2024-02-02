@@ -32,6 +32,7 @@ func main() {
 
 	modules := []bootstrap.Module{
 		module.NewAdminAccount(zClient, bootstrapConfig),
+		module.NewArgoCD(zClient, bootstrapConfig),
 	}
 
 	for _, module := range modules {

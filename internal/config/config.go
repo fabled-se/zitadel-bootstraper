@@ -11,6 +11,7 @@ type Config struct {
 	Zitadel Zitadel `yaml:"zitadel"`
 
 	AdminAccount AdminAccount `yaml:"adminAccount"`
+	ArgoCD       ArgoCD       `yaml:"argoCD"`
 }
 
 type Zitadel struct {
@@ -24,6 +25,16 @@ type AdminAccount struct {
 	Setup    bool   `yaml:"setup"`
 	Username string `yaml:"username"`
 	Password string `yaml:"password"`
+}
+
+type ArgoCD struct {
+	Setup         bool     `yaml:"setup"`
+	Name          string   `yaml:"name"`
+	UserRoleName  string   `yaml:"userRoleName"`
+	AdminRoleName string   `yaml:"adminRoleName"`
+	DevMode       bool     `yaml:"devMode"`
+	RedirectUris  []string `yaml:"redirectUris"`
+	LogoutUris    []string `yaml:"logoutUris"`
 }
 
 func ParseFromFile(path string) (Config, error) {
