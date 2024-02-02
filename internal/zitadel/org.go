@@ -102,7 +102,7 @@ func (c *Client) SearchOrg(i SearchOrgInput) (*SearchOrgOutput, error) {
 	}
 
 	if res.StatusCode != http.StatusOK {
-		return nil, c.unexpectedStatusCodeErr(res.StatusCode, res.Body)
+		return nil, c.unexpectedStatusCodeErr(res)
 	}
 
 	var responseBody SearchOrgOutput

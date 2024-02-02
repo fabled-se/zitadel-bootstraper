@@ -34,11 +34,11 @@ func (c *Client) newRequestWithAuth(method, endpoint string, body io.Reader) (*h
 	return req, nil
 }
 
-func (c *Client) unexpectedStatusCodeErr(statusCode int, body io.Reader) error {
-	bodyBytes, _ := io.ReadAll(body)
+func (c *Client) unexpectedStatusCodeErr(res *http.Response) error {
+	bodyBytes, _ := io.ReadAll(res.Body)
 	return fmt.Errorf(
 		"unexpected status code %d, response body: %s",
-		statusCode,
+		res.StatusCode,
 		string(bodyBytes),
 	)
 }
@@ -73,7 +73,7 @@ func (c *Client) SetupOauthToken(jwt string) error {
 	defer res.Body.Close()
 
 	if res.StatusCode != http.StatusOK {
-		return c.unexpectedStatusCodeErr(res.StatusCode, res.Body)
+		return c.unexpectedStatusCodeErr(res)
 	}
 
 	tokenResponse := struct {

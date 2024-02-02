@@ -7,31 +7,6 @@ import (
 	"net/http"
 )
 
-// func (c *Client) GetUserSelf() error {
-// 	req, err := c.newRequestWithAuth("GET", "auth/v1/users/me", nil)
-// 	if err != nil {
-// 		return fmt.Errorf("failed to create request: %w", err)
-// 	}
-//
-// 	res, err := c.HttpClient.Do(req)
-// 	if err != nil {
-// 		fmt.Errorf("failed to perform request: %w", err)
-// 	}
-//
-// 	defer res.Body.Close()
-//
-// 	bodyBytes, _ := io.ReadAll(res.Body)
-// 	panic(string(bodyBytes))
-//
-// 	if res.StatusCode != http.StatusOK {
-// 		return c.unexpectedStatusCodeErr(res.StatusCode, res.Body)
-// 	}
-//
-// 	// TODO: actually decode json
-//
-// 	return nil
-// }
-
 type CreateUserInput struct {
 	OrgId           string
 	Username        string
@@ -81,7 +56,7 @@ func (c *Client) CreateUser(i CreateUserInput) (*CreateUserOutput, error) {
 	defer res.Body.Close()
 
 	if res.StatusCode != http.StatusOK {
-		return nil, c.unexpectedStatusCodeErr(res.StatusCode, res.Body)
+		return nil, c.unexpectedStatusCodeErr(res)
 	}
 
 	var responseBody CreateUserOutput

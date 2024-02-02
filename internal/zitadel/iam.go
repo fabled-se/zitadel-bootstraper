@@ -37,7 +37,7 @@ func (c *Client) AddIAMMember(userId string, roles []IAMRole) error {
 	defer res.Body.Close()
 
 	if res.StatusCode != http.StatusOK {
-		return c.unexpectedStatusCodeErr(res.StatusCode, res.Body)
+		return c.unexpectedStatusCodeErr(res)
 	}
 
 	return nil
