@@ -1,10 +1,10 @@
-zitadel:
-  TLS: false
-  Domain: "zitadel.local"
-  OrgName: "platform"
-  ServiceUserName: "myuser"
-
 config:
+  zitadel:
+    domain: zitadel.local
+    tls: false
+    orgName: platform
+    serviceUserName: myUser
+
   adminAccount:
     setup: false
     orgName: platform

@@ -14,14 +14,6 @@ spec:
       - name: zitadel-bootstrapper
         image: gothenburg/zitadel-bootstrapper:latest
         env:
-          - name: ZITADEL_TLS
-            value: "{{ .Values.zitadel.TLS }}"
-          - name: ZITADEL_DOMAIN
-            value: {{ .Values.zitadel.Domain }}
-          - name: ZITADEL_ORGNAME
-            value: {{ .Values.zitadel.OrgName }}
-          - name: ZITADEL_SERVICE_USER
-            value: {{ .Values.zitadel.ServiceUserName }}
           - name: ZITADEL_SERVICE_USER_KEY_JSON
             valueFrom:
               secretKeyRef:

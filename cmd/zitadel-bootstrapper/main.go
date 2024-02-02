@@ -16,10 +16,6 @@ import (
 func main() {
 	logger := zerolog.New(os.Stdout)
 
-	zitadelTLS := mustBool(logger, mustEnvVar(logger, "ZITADEL_TLS"))
-	zitadelDomain := mustEnvVar(logger, "ZITADEL_DOMAIN")
-	zitadelOrgName := mustEnvVar(logger, "ZITADEL_ORGNAME")
-	zitadelServiceUser := mustEnvVar(logger, "ZITADEL_SERVICE_USER")
 	zitadelServiceUserKeyJson := mustEnvVar(logger, "ZITADEL_SERVICE_USER_KEY_JSON")
 
 	bootstrapConfig, err := config.ParseFromFile("/etc/zitadel-bootstrapper-config/config-yaml")
@@ -30,13 +26,16 @@ func main() {
 
 	zitadelClient := &zitadel.Client{
 		HttpClient:  http.DefaultClient,
-		TLS:         zitadelTLS,
-		Domain:      zitadelDomain,
-		OrgName:     zitadelOrgName,
-		ServiceUser: zitadelServiceUser,
+		TLS:         bootstrapConfig.Zitadel.TLS,
+		Domain:      bootstrapConfig.Zitadel.Domain,
+		OrgName:     bootstrapConfig.Zitadel.OrgName,
+		ServiceUser: bootstrapConfig.Zitadel.ServiceUserName,
 	}
 
-	jwtKey, err := zitadelClient.NewJWT([]byte(zitadelServiceUserKeyJson), zitadelDomain)
+	jwtKey, err := zitadelClient.NewJWT(
+		[]byte(zitadelServiceUserKeyJson),
+		bootstrapConfig.Zitadel.Domain,
+	)
 	if err != nil {
 		logger.Err(err).Msg("Failed to create a new Zitadel JWT")
 		os.Exit(1)

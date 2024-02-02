@@ -8,7 +8,16 @@ import (
 )
 
 type Config struct {
+	Zitadel Zitadel `yaml:"zitadel"`
+
 	AdminAccount AdminAccount `yaml:"adminAccount"`
+}
+
+type Zitadel struct {
+	Domain          string `yaml:"domain"`
+	TLS             bool   `yaml:"tls"`
+	OrgName         string `yaml:"orgName"`
+	ServiceUserName string `yaml:"serviceUserName"`
 }
 
 type AdminAccount struct {
