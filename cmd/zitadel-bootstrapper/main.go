@@ -24,30 +24,14 @@ func main() {
 		os.Exit(1)
 	}
 
-	zitadelClient := &zitadel.Client{
-		HttpClient:  http.DefaultClient,
-		TLS:         bootstrapConfig.Zitadel.TLS,
-		Domain:      bootstrapConfig.Zitadel.Domain,
-		OrgName:     bootstrapConfig.Zitadel.OrgName,
-		ServiceUser: bootstrapConfig.Zitadel.ServiceUserName,
-	}
-
-	jwtKey, err := zitadelClient.NewJWT(
-		[]byte(zitadelServiceUserKeyJson),
-		bootstrapConfig.Zitadel.Domain,
-	)
+	zClient, err := zitadel.New(http.DefaultClient, bootstrapConfig.Zitadel, zitadelServiceUserKeyJson)
 	if err != nil {
-		logger.Err(err).Msg("Failed to create a new Zitadel JWT")
-		os.Exit(1)
-	}
-
-	if err := zitadelClient.SetupOauthToken(jwtKey); err != nil {
-		logger.Err(err).Msg("Failed to setup zitadel oauth token")
+		logger.Err(err).Msg("Failed to create zitadel client")
 		os.Exit(1)
 	}
 
 	modules := []bootstrap.Module{
-		module.NewAdminAccount(zitadelClient, bootstrapConfig),
+		module.NewAdminAccount(zClient, bootstrapConfig),
 	}
 
 	for _, module := range modules {

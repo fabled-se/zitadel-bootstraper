@@ -10,7 +10,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-func (c *Client) NewJWT(keyDataJson []byte, domain string) (string, error) {
+func (c *Client) newJWT(keyDataJson []byte, domain string) (string, error) {
 	data := struct {
 		KeyID  string `json:"keyId"`
 		Key    string `json:"key"`

@@ -7,7 +7,30 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+
+	"github.com/fabled-se/zitadel-bootstraper/internal/config"
 )
+
+func New(httpClient *http.Client, conf config.Zitadel, keyJson string) (*Client, error) {
+	c := &Client{
+		HttpClient:  httpClient,
+		TLS:         conf.TLS,
+		Domain:      conf.Domain,
+		OrgName:     conf.OrgName,
+		ServiceUser: conf.ServiceUserName,
+	}
+
+	jwt, err := c.newJWT([]byte(keyJson), conf.Domain)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create jwt: %w", err)
+	}
+
+	if err := c.requestOauthToken(jwt); err != nil {
+		return nil, fmt.Errorf("failed to setup oauth token: %w", err)
+	}
+
+	return c, nil
+}
 
 type Client struct {
 	HttpClient  *http.Client
@@ -52,7 +75,7 @@ func (c *Client) getBaseUrl() string {
 	return fmt.Sprintf("%s://%s", protocol, c.Domain)
 }
 
-func (c *Client) SetupOauthToken(jwt string) error {
+func (c *Client) requestOauthToken(jwt string) error {
 	form := url.Values{}
 	form.Add("grant_type", "urn:ietf:params:oauth:grant-type:jwt-bearer")
 	form.Add("scope", "openid profile email urn:zitadel:iam:org:project:id:zitadel:aud")
