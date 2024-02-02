@@ -22,7 +22,6 @@ type Zitadel struct {
 
 type AdminAccount struct {
 	Setup    bool   `yaml:"setup"`
-	OrgName  string `yaml:"orgName"`
 	Username string `yaml:"username"`
 	Password string `yaml:"password"`
 }

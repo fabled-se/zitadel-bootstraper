@@ -12,12 +12,17 @@ import (
 )
 
 func NewAdminAccount(zClient *zitadel.Client, conf config.Config) bootstrap.Module {
-	return &adminAccountModule{zClient: zClient, conf: conf.AdminAccount}
+	return &adminAccountModule{
+		zClient:        zClient,
+		zitadelOrgName: conf.Zitadel.OrgName,
+		conf:           conf.AdminAccount,
+	}
 }
 
 type adminAccountModule struct {
-	zClient *zitadel.Client
-	conf    config.AdminAccount
+	zClient        *zitadel.Client
+	zitadelOrgName string
+	conf           config.AdminAccount
 }
 
 func (a *adminAccountModule) Name() string {
@@ -28,11 +33,11 @@ func (a *adminAccountModule) Execute(ctx context.Context) error {
 	log := zerolog.Ctx(ctx)
 
 	if !a.conf.Setup {
-		log.Warn().Msg("AdminAccount setup is disabled, skipping module")
+		log.Warn().Msg("Setup is disabled, skipping module")
 		return nil
 	}
 
-	org, err := a.zClient.GetOrgByName(a.conf.OrgName)
+	org, err := a.zClient.GetOrgByName(a.zitadelOrgName)
 	if err != nil {
 		return fmt.Errorf("failed to get org by name: %w", err)
 	}
