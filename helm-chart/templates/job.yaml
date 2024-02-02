@@ -17,8 +17,8 @@ spec:
           - name: ZITADEL_SERVICE_USER_KEY_JSON
             valueFrom:
               secretKeyRef:
-                name: {{ .Values.zitadel.ServiceUserName }}
-                key: {{  .Values.zitadel.ServiceUserName }}{{ ".json" }}
+                name: {{ .Values.config.zitadel.serviceUserName }}
+                key: {{  .Values.config.zitadel.serviceUserName }}{{ ".json" }}
         volumeMounts:
           - name: config
             readOnly: true
