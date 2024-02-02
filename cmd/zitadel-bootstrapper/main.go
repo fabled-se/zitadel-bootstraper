@@ -1,10 +1,14 @@
 package main
 
 import (
+	"context"
 	"net/http"
 	"os"
 	"strconv"
 
+	"github.com/fabled-se/zitadel-bootstraper/internal/bootstrap"
+	"github.com/fabled-se/zitadel-bootstraper/internal/config"
+	"github.com/fabled-se/zitadel-bootstraper/internal/module"
 	"github.com/fabled-se/zitadel-bootstraper/internal/zitadel"
 	"github.com/rs/zerolog"
 )
@@ -18,7 +22,13 @@ func main() {
 	zitadelServiceUser := mustEnvVar(logger, "ZITADEL_SERVICE_USER")
 	zitadelServiceUserKeyJson := mustEnvVar(logger, "ZITADEL_SERVICE_USER_KEY_JSON")
 
-	zitadelClient := zitadel.Client{
+	bootstrapConfig, err := config.ParseFromFile("/etc/zitadel-bootstrapper-config/config-yaml")
+	if err != nil {
+		logger.Err(err).Msg("Failed to parse config file")
+		os.Exit(1)
+	}
+
+	zitadelClient := &zitadel.Client{
 		HttpClient:  http.DefaultClient,
 		TLS:         zitadelTLS,
 		Domain:      zitadelDomain,
@@ -37,7 +47,21 @@ func main() {
 		os.Exit(1)
 	}
 
-	logger.Info().Msg("Success")
+	modules := []bootstrap.Module{
+		module.NewAdminAccount(zitadelClient, bootstrapConfig),
+	}
+
+	for _, module := range modules {
+		log := logger.With().Str("module", module.Name()).Logger()
+
+		// TODO: Context with deadline?
+		if err := module.Execute(log.WithContext(context.TODO())); err != nil {
+			log.Err(err).Msg("Failed to execute module")
+			os.Exit(1)
+		}
+	}
+
+	logger.Info().Msg("Bootstrapping successful")
 }
 
 func mustBool(logger zerolog.Logger, value string) bool {

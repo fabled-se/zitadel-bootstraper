@@ -19,6 +19,30 @@ type Client struct {
 	serviceUserToken string
 }
 
+func (c *Client) newRequest(method, endpoint string, body io.Reader) (*http.Request, error) {
+	return http.NewRequest(method, c.getBaseUrl()+"/"+endpoint, body)
+}
+
+func (c *Client) newRequestWithAuth(method, endpoint string, body io.Reader) (*http.Request, error) {
+	req, err := c.newRequest(method, endpoint, body)
+	if err != nil {
+		return req, err
+	}
+
+	req.Header.Add("Authorization", "Bearer "+c.serviceUserToken)
+
+	return req, nil
+}
+
+func (c *Client) unexpectedStatusCodeErr(statusCode int, body io.Reader) error {
+	bodyBytes, _ := io.ReadAll(body)
+	return fmt.Errorf(
+		"unexpected status code %d, response body: %s",
+		statusCode,
+		string(bodyBytes),
+	)
+}
+
 func (c *Client) getBaseUrl() string {
 	protocol := "http"
 	if c.TLS {
@@ -31,14 +55,10 @@ func (c *Client) getBaseUrl() string {
 func (c *Client) SetupOauthToken(jwt string) error {
 	form := url.Values{}
 	form.Add("grant_type", "urn:ietf:params:oauth:grant-type:jwt-bearer")
-	form.Add("scope", "openid profile email")
+	form.Add("scope", "openid profile email urn:zitadel:iam:org:project:id:zitadel:aud")
 	form.Add("assertion", jwt)
 
-	req, err := http.NewRequest(
-		"POST",
-		fmt.Sprintf("%s/oauth/v2/token", c.getBaseUrl()),
-		strings.NewReader(form.Encode()),
-	)
+	req, err := c.newRequest("POST", "oauth/v2/token", strings.NewReader(form.Encode()))
 	if err != nil {
 		return fmt.Errorf("failed to create request: %w", err)
 	}
@@ -53,8 +73,7 @@ func (c *Client) SetupOauthToken(jwt string) error {
 	defer res.Body.Close()
 
 	if res.StatusCode != http.StatusOK {
-		bodyBytes, _ := io.ReadAll(res.Body)
-		return fmt.Errorf("unexpected status code %d, body: %s", res.StatusCode, string(bodyBytes))
+		return c.unexpectedStatusCodeErr(res.StatusCode, res.Body)
 	}
 
 	tokenResponse := struct {
