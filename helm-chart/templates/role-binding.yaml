@@ -8,6 +8,6 @@ subjects:
     name: zitadel-bootstrapper
     apiGroup: ""
 roleRef:
-  kind: Role
+  kind: CluserRole
   name: secrets-creator
   apiGroup: ""
