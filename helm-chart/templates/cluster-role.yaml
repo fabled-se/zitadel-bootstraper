@@ -4,5 +4,5 @@ metadata:
   name: secrets-creator
 rules:
   - apiGroups: [""]
-    resources: ["secrets"]
+    resources: ["secret"]
     verbs: ["create"]
