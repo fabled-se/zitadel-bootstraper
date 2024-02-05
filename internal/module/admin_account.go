@@ -45,8 +45,8 @@ func (a *adminAccountModule) Execute(ctx context.Context) error {
 	input := zitadel.CreateUserInput{
 		OrgId:           org.Id,
 		Username:        a.conf.Username,
-		Firstname:       a.conf.Username,
-		Lastname:        a.conf.Username,
+		Firstname:       a.conf.Firstname,
+		Lastname:        a.conf.Lastname,
 		Email:           a.conf.Username,
 		EmailIsVerified: true,
 		Password:        a.conf.Password,
