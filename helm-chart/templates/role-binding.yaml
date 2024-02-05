@@ -5,7 +5,7 @@ metadata:
   namespace: argocd
 subjects:
   - kind: ServiceAccount
-    name: auth:zitadel-bootstrapper
+    name: zitadel-bootstrapper
     apiGroup: ""
 roleRef:
   kind: ClusterRole
