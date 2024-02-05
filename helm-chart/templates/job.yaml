@@ -3,6 +3,7 @@ kind: Job
 metadata:
   name: zitadel-bootstrapper
 spec:
+  serviceAccountName: zitadelBootstrapper
   backoffLimit: 5
   template:
     spec:
