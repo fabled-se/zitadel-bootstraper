@@ -6,8 +6,8 @@ metadata:
 subjects:
   - kind: ServiceAccount
     name: zitadel-bootstrapper
-    apiGroup: rbac.authorization.k8s.io
+    apiGroup: ""
 roleRef:
   kind: Role
   name: secrets-creator
-  apiGroup: rbac.authorization.k8s.io
+  apiGroup: ""
