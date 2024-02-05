@@ -3,10 +3,10 @@ kind: Job
 metadata:
   name: zitadel-bootstrapper
 spec:
-  serviceAccountName: zitadel-bootstrapper
   backoffLimit: 5
   template:
     spec:
+      serviceAccountName: zitadel-bootstrapper
       volumes:
         - name: config
           secret:
