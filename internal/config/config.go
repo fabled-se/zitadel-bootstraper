@@ -22,9 +22,11 @@ type Zitadel struct {
 }
 
 type AdminAccount struct {
-	Setup    bool   `yaml:"setup"`
-	Username string `yaml:"username"`
-	Password string `yaml:"password"`
+	Setup     bool   `yaml:"setup"`
+	Firstname string `yaml:"firstname"`
+	Lastname  string `yaml:"lastname"`
+	Username  string `yaml:"username"`
+	Password  string `yaml:"password"`
 }
 
 type ArgoCD struct {
@@ -44,6 +46,8 @@ func ParseFromFile(path string) (Config, error) {
 	if err != nil {
 		return c, fmt.Errorf("failed to open file path: %w", err)
 	}
+
+	defer f.Close()
 
 	if err := yaml.NewDecoder(f).Decode(&c); err != nil {
 		return c, fmt.Errorf("failed to decode yaml: %w", err)
