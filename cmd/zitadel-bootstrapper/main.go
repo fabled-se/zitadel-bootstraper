@@ -2,12 +2,16 @@ package main
 
 import (
 	"context"
+	"crypto/tls"
+	"crypto/x509"
+	"io"
 	"net/http"
 	"os"
-	"strconv"
+	"time"
 
 	"github.com/fabled-se/zitadel-bootstraper/internal/bootstrap"
 	"github.com/fabled-se/zitadel-bootstraper/internal/config"
+	"github.com/fabled-se/zitadel-bootstraper/internal/kubernetes"
 	"github.com/fabled-se/zitadel-bootstraper/internal/module"
 	"github.com/fabled-se/zitadel-bootstraper/internal/zitadel"
 	"github.com/rs/zerolog"
@@ -15,6 +19,11 @@ import (
 
 func main() {
 	logger := zerolog.New(os.Stdout)
+
+	kubernetesApiHost := mustEnvVar(logger, "KUBERNETES_SERVICE_HOST")
+	kubernetesAPiPort := mustEnvVar(logger, "KUBERNETES_PORT_443_TCP_PORT")
+	kubernetesToken := mustFileReadAll(logger, "var/run/secrets/kubernetes.io/serviceaccount/token")
+	kubernetsCACert := mustFileReadAll(logger, "var/run/secrets/kubernetes.io/serviceaccount/ca.crt")
 
 	zitadelServiceUserKeyJson := mustEnvVar(logger, "ZITADEL_SERVICE_USER_KEY_JSON")
 
@@ -24,6 +33,22 @@ func main() {
 		os.Exit(1)
 	}
 
+	caCertPool := x509.NewCertPool()
+	caCertPool.AppendCertsFromPEM(kubernetsCACert)
+
+	kHttpClient := &http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{
+				RootCAs: caCertPool,
+			},
+		},
+	}
+
+	// TODO: take namespace as helm value?
+	kClient := kubernetes.New(kHttpClient, kubernetesApiHost, kubernetesAPiPort).
+		WithNamespace("argocd").
+		WithToken(string(kubernetesToken))
+
 	zClient, err := zitadel.New(http.DefaultClient, bootstrapConfig.Zitadel, zitadelServiceUserKeyJson)
 	if err != nil {
 		logger.Err(err).Msg("Failed to create zitadel client")
@@ -32,7 +57,7 @@ func main() {
 
 	modules := []bootstrap.Module{
 		module.NewAdminAccount(zClient, bootstrapConfig),
-		module.NewArgoCD(zClient, bootstrapConfig),
+		module.NewArgoCD(zClient, kClient, bootstrapConfig),
 	}
 
 	for _, module := range modules {
@@ -41,6 +66,7 @@ func main() {
 		// TODO: Context with deadline?
 		if err := module.Execute(log.WithContext(context.TODO())); err != nil {
 			log.Err(err).Msg("Failed to execute module")
+			time.Sleep(1 * time.Hour)
 			os.Exit(1)
 		}
 	}
@@ -48,13 +74,22 @@ func main() {
 	logger.Info().Msg("Bootstrapping successful")
 }
 
-func mustBool(logger zerolog.Logger, value string) bool {
-	boolValue, err := strconv.ParseBool(value)
+func mustFileReadAll(logger zerolog.Logger, path string) []byte {
+	f, err := os.Open(path)
 	if err != nil {
-		logger.Err(err).Msgf("Value '%s' must be parsed to bool", value)
+		logger.Err(err).Str("path", path).Msg("Failed to open file")
 		os.Exit(1)
 	}
-	return boolValue
+
+	defer f.Close()
+
+	b, err := io.ReadAll(f)
+	if err != nil {
+		logger.Err(err).Msg("Failed to read bytes from file")
+		os.Exit(1)
+	}
+
+	return b
 }
 
 func mustEnvVar(logger zerolog.Logger, key string) string {

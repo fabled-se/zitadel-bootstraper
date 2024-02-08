@@ -6,13 +6,15 @@ import (
 
 	"github.com/fabled-se/zitadel-bootstraper/internal/bootstrap"
 	"github.com/fabled-se/zitadel-bootstraper/internal/config"
+	"github.com/fabled-se/zitadel-bootstraper/internal/kubernetes"
 	"github.com/fabled-se/zitadel-bootstraper/internal/zitadel"
 	"github.com/rs/zerolog"
 )
 
-func NewArgoCD(zClient *zitadel.Client, conf config.Config) bootstrap.Module {
+func NewArgoCD(zClient *zitadel.Client, kClient *kubernetes.Client, conf config.Config) bootstrap.Module {
 	return &argocdModule{
 		zClient:        zClient,
+		kClient:        kClient,
 		zitadelOrgName: conf.Zitadel.OrgName,
 		conf:           conf.ArgoCD,
 	}
@@ -20,6 +22,7 @@ func NewArgoCD(zClient *zitadel.Client, conf config.Config) bootstrap.Module {
 
 type argocdModule struct {
 	zClient        *zitadel.Client
+	kClient        *kubernetes.Client
 	zitadelOrgName string
 	conf           config.ArgoCD
 }
@@ -88,9 +91,16 @@ func (a *argocdModule) Execute(ctx context.Context) error {
 		return fmt.Errorf("failed to create oidc application: %w", err)
 	}
 
-	// Save application as k8s secret?
+	labels := map[string]string{"app.kubernetes.io/part-of": "argocd"}
+	values := map[string]string{
+		"config.appId":    application.AppId,
+		"config.clientId": application.ClientId,
+		"config.secretId": application.ClientSecret,
+	}
 
-	// TODO: Save application clientId and clientSecret as k8s secrets in argocd namespace?
+	if err := a.kClient.CreateSecretStringData("argocd-zitadel-oidc", labels, values); err != nil {
+		return fmt.Errorf("failed to create kubernetes oidc secret: %w", err)
+	}
 
 	log.Info().Interface("application", application).Msg("Created ArgoCD project")
 
