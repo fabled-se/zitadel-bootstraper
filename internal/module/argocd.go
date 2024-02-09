@@ -93,9 +93,8 @@ func (a *argocdModule) Execute(ctx context.Context) error {
 
 	labels := map[string]string{"app.kubernetes.io/part-of": "argocd"}
 	values := map[string]string{
-		"config.appId":    application.AppId,
-		"config.clientId": application.ClientId,
-		"config.secretId": application.ClientSecret,
+		"clientId": application.ClientId,
+		"secretId": application.ClientSecret,
 	}
 
 	if err := a.kClient.CreateSecretStringData("argocd-zitadel-oidc", labels, values); err != nil {
