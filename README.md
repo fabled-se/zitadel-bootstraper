@@ -42,7 +42,7 @@ Example usage of argo-cd helm chart
         cm:
           oidc.config: |
             name: Zitadel
-            issuer: https://<ZITADEL-URL>
+            issuer: https://argocd.argocd.svc.cluster.local
             ClientID: $argocd-zitadel-oidc:clientId
             ClientSecret: $argocd-zitadel-oidc:secretId
             requestedScopes:
