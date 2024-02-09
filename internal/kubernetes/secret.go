@@ -13,9 +13,9 @@ func (c *Client) CreateSecretStringData(name string, labels, values map[string]s
 		"apiVersion": "v1",
 		"kind":       "Secret",
 		"metadata": map[string]any{
-			"name": name,
+			"name":   name,
+			"labels": labels,
 		},
-		"labels":     labels,
 		"stringData": values,
 	}
 
