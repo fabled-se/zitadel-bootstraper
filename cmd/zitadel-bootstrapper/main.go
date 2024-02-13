@@ -7,7 +7,6 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"time"
 
 	"github.com/fabled-se/zitadel-bootstraper/internal/bootstrap"
 	"github.com/fabled-se/zitadel-bootstraper/internal/config"
@@ -66,7 +65,6 @@ func main() {
 		// TODO: Context with deadline?
 		if err := module.Execute(log.WithContext(context.TODO())); err != nil {
 			log.Err(err).Msg("Failed to execute module")
-			time.Sleep(1 * time.Hour)
 			os.Exit(1)
 		}
 	}
